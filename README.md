@@ -1,5 +1,5 @@
-# sift
-Browser extension to Save Images From Tabs.
+# sifty
+Browser extension to Save Images From Tabs, Yo!
 
 ## Running Locally
 Clone the source, and cd into the source directory.

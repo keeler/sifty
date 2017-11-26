@@ -1,13 +1,13 @@
 {
     "manifest_version": 2,
-    "name": "sift",
+    "name": "sifty",
     "version": "0.1",
 
-    "description": "Save Images From Tabs.",
+    "description": "Save Images From Tabs, Yo!",
 
     "icons": {
-        "48": "icons/sift-48.png",
-        "96": "icons/sift-96.png"
+        "48": "icons/sifty-48.png",
+        "96": "icons/sifty-96.png"
     },
 
     "permissions": [
@@ -19,10 +19,10 @@
 
     "browser_action": {
         "default_icon": {
-            "48": "icons/sift-48.png",
-            "96": "icons/sift-96.png"
+            "48": "icons/sifty-48.png",
+            "96": "icons/sifty-96.png"
         },
-        "default_title": "Save Images From Tabs"
+        "default_title": "Save Images From Tabs, Yo!"
     },
 
     "background": {
