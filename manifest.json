@@ -1,0 +1,31 @@
+{
+    "manifest_version": 2,
+    "name": "sift",
+    "version": "0.1",
+
+    "description": "Save Images From Tabs.",
+
+    "icons": {
+        "48": "icons/sift-48.png",
+        "96": "icons/sift-96.png"
+    },
+
+    "permissions": [
+        "tabs",
+        "downloads",
+        "http://*/",
+        "https://*/"
+    ],
+
+    "browser_action": {
+        "default_icon": {
+            "48": "icons/sift-48.png",
+            "96": "icons/sift-96.png"
+        },
+        "default_title": "Save Images From Tabs"
+    },
+
+    "background": {
+        "scripts": ["sift.js"]
+    }
+}
