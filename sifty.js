@@ -22,8 +22,16 @@ function processTab(tab) {
     });
 }
 
+function getFilenameFromUrl(url) {
+    var result = url.substring(0, (url.indexOf('#') == -1 ? url.length : url.indexOf('#')));
+    result = result.substring(0, (url.indexOf('?') == -1 ? url.length : url.indexOf('?')));
+    result = result.substring(result.lastIndexOf('/') + 1, url.length);
+    result = result.replace(/[|\\/&;:$%@!"<>()^+=?*,]/g, '_');
+    return result;
+}
+
 function downloadImage(imgSrc, completedCallback) {
-    var filename = imgSrc.substr(imgSrc.lastIndexOf('/') + 1).replace(/[|\\/&;:$%@!"<>()^+=?*,]/g, '_')
+    var filename = getFilenameFromUrl(imgSrc)
     browser.downloads.download({
         url: imgSrc,
         filename: filename,

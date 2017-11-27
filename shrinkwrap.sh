@@ -1,1 +1,1 @@
-zip -r9 sifty.zip *
+zip -r9 sifty.zip * -x shrinkwrap.sh
