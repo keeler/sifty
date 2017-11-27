@@ -23,7 +23,7 @@ function processTab(tab) {
 }
 
 function downloadImage(imgSrc, completedCallback) {
-    var filename = imgSrc.substr(imgSrc.lastIndexOf('/') + 1);
+    var filename = imgSrc.substr(imgSrc.lastIndexOf('/') + 1).replace(/[|\\/&;:$%@!"<>()^+=?*,]/g, '_')
     browser.downloads.download({
         url: imgSrc,
         filename: filename,
