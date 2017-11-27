@@ -27,7 +27,8 @@ function downloadImage(imgSrc, completedCallback) {
     browser.downloads.download({
         url: imgSrc,
         filename: filename,
-        conflictAction: 'uniquify'
+        conflictAction: 'uniquify',
+        incognito: true
     }).then((id) => {
         console.log('Download of ' + imgSrc + ' started...');
         browser.downloads.onChanged.addListener(waitForDownloadComplete(id, completedCallback));

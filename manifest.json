@@ -26,6 +26,6 @@
     },
 
     "background": {
-        "scripts": ["sift.js"]
+        "scripts": ["sifty.js"]
     }
 }
