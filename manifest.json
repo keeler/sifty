@@ -6,8 +6,11 @@
     "description": "Save Images From Tabs, Yo!",
 
     "icons": {
-        "48": "icons/sifty-48.png",
-        "96": "icons/sifty-96.png"
+        "16": "icons/sifty.svg",
+        "32": "icons/sifty.svg",
+        "48": "icons/sifty.svg",
+        "64": "icons/sifty.svg",
+        "96": "icons/sifty.svg"
     },
 
     "permissions": [
@@ -19,8 +22,11 @@
 
     "browser_action": {
         "default_icon": {
-            "48": "icons/sifty-48.png",
-            "96": "icons/sifty-96.png"
+            "16": "icons/sifty.svg",
+            "32": "icons/sifty.svg",
+            "48": "icons/sifty.svg",
+            "64": "icons/sifty.svg",
+            "96": "icons/sifty.svg"
         },
         "default_title": "Save Images From Tabs, Yo!"
     },
