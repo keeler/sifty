@@ -9,7 +9,7 @@
     function processThisTab() {
         var img = getImage();
         if(!img) {
-            return;
+            return null;
         }
         return img;
     }

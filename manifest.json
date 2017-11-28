@@ -12,6 +12,7 @@
     "permissions": [
         "tabs",
         "downloads",
+        "notifications",
         "http://*/",
         "https://*/"
     ],
