@@ -9,7 +9,10 @@
     function getItem() {
         for(var mimeType of supportedMimeTypes){
             if(0 === document.contentType.indexOf(mimeType + '/')) {
-                return { src: document.URL }
+                return {
+                    src: document.URL,
+                    mimeType: document.contentType
+                }
             }
         }
 

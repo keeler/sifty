@@ -3,9 +3,9 @@
     "name": "sifty",
     "author": "Keeler Russell",
     "homepage_url": "https://github.com/keeler/sifty",
-    "version": "0.2",
+    "version": "0.3",
 
-    "description": "Save Images From Tabs, Yo!",
+    "description": "Save Items From Tabs, Yo!",
 
     "icons": {
         "96": "icons/sifty.svg"
@@ -23,7 +23,7 @@
         "default_icon": {
             "96": "icons/sifty.svg"
         },
-        "default_title": "Save Images From Tabs, Yo!"
+        "default_title": "Save Items From Tabs, Yo!"
     },
 
     "background": {

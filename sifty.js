@@ -1,20 +1,91 @@
 // Wait for the user to click the button in their toolbar.
-browser.browserAction.onClicked.addListener(processTabs)
+browser.browserAction.onClicked.addListener(handleToolbarButtonClicked)
+
+function handleToolbarButtonClicked() {
+    downloadMediaItems()
+}
+
+function downloadMediaItems() {
+    // Get all tabs in current window.
+    getTabsInWindow().then((tabs) => {
+        // Search tabs for items
+        var mediaItemsFound = []
+        for(var tab of tabs) {
+            mediaItemsFound.push(findMediaItemInTab(tab))
+        }
+
+        // Make a promise for all the downloads to complete.
+        var downloadsComplete = new Promise((resolveDownloadsComplete, reject) => {
+            // Only start once all the tabs have been scanned for items.
+            Promise.all(mediaItemsFound).then((mediaItems) => {
+                // Filter to tabs that had an item.
+                mediaItems = mediaItems.filter(item => !!item && !!item.src)
+                if(mediaItems.length <= 0) {
+                    // If there are no items, resolve with 0 downloads.
+                    return resolveDownloadsComplete(0)
+                }
+                
+                // Otherwise we have items, tell user we're starting downloads.
+                notify({
+                    id: 'sifty-working',
+                    message:'Downloading ' + mediaItems.length + ' files...',
+                    timeoutInMs: 0
+                })
+
+                // Create a bunch of download promises.
+                var downloadsFinished = []
+                for(let item of mediaItems) {
+                    var download = startDownload(item).then((downloadId) => {
+                        item.downloadId = downloadId
+                        return finishDownload(item)
+                    })
+                    downloadsFinished.push(download)
+                }
+
+                // When all the download promises are complete, resolve the
+                // parent promise with the number of completed downloadsFinished.
+                Promise.all(downloadsFinished).then((alldone) => {
+                    resolveDownloadsComplete(downloadsFinished.length)
+                })
+            })
+        })
+        
+        // Wait for all the downloads to complete.
+        downloadsComplete.then((downloadCount) => {
+            var note = {
+                id: 'sifty-finished',
+                timeoutInMs: 2000
+            }
+
+            // Tell user how many downloads went through.
+            if(downloadCount > 0) {
+                browser.notifications.clear('sifty-working')
+                note.message = 'Done! (' + downloadCount + ' saved)'
+            }
+            else {
+                note.message = 'No media files to download'
+            }
+
+            notify(note)
+        })
+    })
+}
 
 function getTabsInWindow() {
     return browser.tabs.query({currentWindow: true})
 }
 
-function findImagesInTab(tab) {
-    // Execute a content script in the tab which
-    // returns the img src within (if any).
+function findMediaItemInTab(tab) {
+    // Execute a script in the tab find and return
+    // the source of the media item (e.g. a .jpeg,
+    // .webm, .mp3 file) in the tab. if any exists.
     return browser.tabs.executeScript(
         tab.id,
-        {file: '/content_scripts/getImage.js'}
-    ).then((images) => {
+        {file: '/content_scripts/getItem.js'}
+    ).then((items) => {
         return {
             'tabId': tab.id,
-            'imgSrc': !!images && !!images[0] > 0 ? images[0].src : null
+            'src': !!items && !!items[0] > 0 ? items[0].src : null
         }
     }).catch((error) => {
         // This usually happens on about:* or resource:* pages, which
@@ -24,77 +95,12 @@ function findImagesInTab(tab) {
     })
 }
 
-function processTabs() {
-    // Get all tabs in current window.
-    getTabsInWindow().then((tabs) => {
-        // Search tabs for images
-        var findPromises = []
-        for(var tab of tabs) {
-            findPromises.push(findImagesInTab(tab))
-        }
-
-        // Make a promise for all the downloads to complete.
-        var downloadsComplete = new Promise((resolveDownloadsComplete, reject) => {
-            Promise.all(findPromises).then((imageTabs) => {
-                // Filter to tabs that had an image.
-                var imgTabs = imageTabs.filter(tab => !!tab && !!tab.imgSrc)
-                if(imgTabs.length <= 0) {
-                    // If there are no images, resolve with 0 downloads.
-                    return resolveDownloadsComplete(0)
-                }
-                
-                // Otherwise we have images, tell user we're starting downloads.
-                notify({
-                    id: 'sifty-working',
-                    message:'Downloading ' + imgTabs.length + ' files...',
-                    timeoutInMs: 0
-                })
-
-                // Create a bunch of download promises.
-                var downloads = []
-                for(let t of imgTabs) {
-                    var download = startDownload(t).then((downloadId) => {
-                        t.downloadId = downloadId
-                        return finishDownload(t)
-                    })
-                    downloads.push(download)
-                }
-
-                // When all the download promises are complete, resolve the
-                // parent promise with the number of completed downloads.
-                Promise.all(downloads).then((alldone) => {
-                    resolveDownloadsComplete(downloads.length)
-                })
-            })
-        })
-        
-        // Wait for all the downloads to complete.
-        downloadsComplete.then((downloadCount) => {
-            var note = {
-                id: 'sifty-finished',
-                timeoutInMs: 1500
-            }
-
-            // Tell user how many downloads went through.
-            if(downloadCount > 0) {
-                browser.notifications.clear('sifty-working')
-                note.message = 'Done! (' + downloadCount + ' saved)'
-            }
-            else {
-                note.message = 'No images found.'
-            }
-
-            notify(note)
-        })
-    })
-}
-
 // Timeout defaults to 2 sec, set to 0 to not timeout.
 function notify(note) {
     browser.notifications.create(note.id, {
         'type': 'basic',
         'iconUrl': browser.extension.getURL('icons/sifty.svg'),
-        'title': 'Save Images From Tabs, Yo!',
+        'title': 'Save Items From Tabs, Yo!',
         'message': note.message
     })
 
@@ -116,10 +122,10 @@ function getFilenameFromUrl(url) {
     return result
 }
 
-function startDownload(tabImg) {
+function startDownload(mediaItem) {
     return browser.downloads.download({
-        url: tabImg.imgSrc,
-        filename: getFilenameFromUrl(tabImg.imgSrc),
+        url: mediaItem.src,
+        filename: getFilenameFromUrl(mediaItem.src),
         conflictAction: 'uniquify',
         incognito: true
     })
@@ -135,14 +141,16 @@ function callWhenDownloadComplete(id, callback) {
 }
 
 // Finish the download by setting up the tab to close when the download completes.
-function finishDownload(tabImg) {
+function finishDownload(mediaItem) {
     return new Promise((resolve, reject) => {
         // The callback passed to callWhenDownloadComplete will
         // close the tab then resolve this promise.
-        browser.downloads.onChanged.addListener(callWhenDownloadComplete(tabImg.downloadId, function() {
-            browser.tabs.remove(tabImg.tabId)
-            resolve(tabImg.imgSrc)
-        }))
+        browser.downloads.onChanged.addListener(
+            callWhenDownloadComplete(mediaItem.downloadId, function() {
+                browser.tabs.remove(mediaItem.tabId)
+                resolve(mediaItem.src)
+            })
+        )
     }).catch((error) => {
         console.log("Couldn't download: " + error)
         return null
