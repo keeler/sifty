@@ -15,38 +15,10 @@ function downloadMediaItems() {
         }
 
         // Make a promise for all the downloads to complete.
-        var downloadsComplete = new Promise((resolveDownloadsComplete, reject) => {
+        var downloadsComplete = new Promise((resolveAllDownloadsComplete, reject) => {
             // Only start once all the tabs have been scanned for items.
             Promise.all(mediaItemsFound).then((mediaItems) => {
-                // Filter to tabs that had an item.
-                mediaItems = mediaItems.filter(item => !!item && !!item.src)
-                if(mediaItems.length <= 0) {
-                    // If there are no items, resolve with 0 downloads.
-                    return resolveDownloadsComplete(0)
-                }
-                
-                // Otherwise we have items, tell user we're starting downloads.
-                notify({
-                    id: 'sifty-working',
-                    message:'Downloading ' + mediaItems.length + ' files...',
-                    timeoutInMs: 0
-                })
-
-                // Create a bunch of download promises.
-                var downloadsFinished = []
-                for(let item of mediaItems) {
-                    var download = startDownload(item).then((downloadId) => {
-                        item.downloadId = downloadId
-                        return finishDownload(item)
-                    })
-                    downloadsFinished.push(download)
-                }
-
-                // When all the download promises are complete, resolve the
-                // parent promise with the number of completed downloadsFinished.
-                Promise.all(downloadsFinished).then((alldone) => {
-                    resolveDownloadsComplete(downloadsFinished.length)
-                })
+                return downloadAll(mediaItems, resolveAllDownloadsComplete)
             })
         })
         
@@ -120,6 +92,38 @@ function getFilenameFromUrl(url) {
     result = result.substring(result.lastIndexOf('/') + 1, url.length)
     result = result.replace(/[|\\/&:$%@!"<>()^+=?*,]/g, '_')
     return result
+}
+
+function downloadAll(mediaItems, callWhenComplete) {
+    // Filter to tabs that had an item.
+    mediaItems = mediaItems.filter(item => !!item && !!item.src)
+    if(mediaItems.length <= 0) {
+        // If there are no items, resolve with 0 downloads.
+        return callWhenComplete(0)
+    }
+    
+    // Otherwise we have items, tell user we're starting downloads.
+    notify({
+        id: 'sifty-working',
+        message:'Downloading ' + mediaItems.length + ' files...',
+        timeoutInMs: 0
+    })
+
+    // Create a bunch of download promises.
+    var downloadsFinished = []
+    for(let item of mediaItems) {
+        var download = startDownload(item).then((downloadId) => {
+            item.downloadId = downloadId
+            return finishDownload(item)
+        })
+        downloadsFinished.push(download)
+    }
+
+    // When all the download promises are complete, resolve the
+    // parent promise with the number of completed downloadsFinished.
+    Promise.all(downloadsFinished).then((alldone) => {
+        callWhenComplete(downloadsFinished.length)
+    })
 }
 
 function startDownload(mediaItem) {
