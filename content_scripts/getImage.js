@@ -1,18 +1,28 @@
 (function() {
-    function getImage() {
-        if(0 === document.contentType.indexOf("image")) {
-            return { src: document.URL };
+    supportedMimeTypes = [
+        'image',
+        'video',
+        'audio'
+    ]
+
+    // Grab the source of the media file (image, video, audio, etc.)
+    function getItem() {
+        for(var mimeType of supportedMimeTypes){
+            if(0 === document.contentType.indexOf(mimeType + '/')) {
+                return { src: document.URL }
+            }
         }
-        return null;
+
+        return null
     }
 
     function processThisTab() {
-        var img = getImage();
-        if(!img) {
-            return null;
+        var mediaItem = getItem()
+        if(!mediaItem) {
+            return null
         }
-        return img;
+        return mediaItem
     }
 
-    return processThisTab();
-})();
+    return processThisTab()
+})()
