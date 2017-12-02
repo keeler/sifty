@@ -18,18 +18,33 @@ function downloadMediaItems() {
         var downloadsComplete = new Promise((resolveAllDownloadsComplete, reject) => {
             // Only start once all the tabs have been scanned for items.
             Promise.all(mediaItemsFound).then((mediaItems) => {
+                // Filter to tabs that had an item.
+                mediaItems = mediaItems.filter(item => !!item && !!item.src)
+                if(mediaItems.length <= 0) {
+                    // If there are no items, resolve with 0 downloads.
+                    return resolveAllDownloadsComplete([])
+                }
+                
+                // Otherwise we have items, tell user we're starting downloads.
+                notify({
+                    id: 'sifty-working',
+                    message:'Downloading ' + mediaItems.length + ' files...',
+                    timeoutInMs: 0
+                })
+
                 return downloadAll(mediaItems, resolveAllDownloadsComplete)
             })
         })
         
         // Wait for all the downloads to complete.
-        downloadsComplete.then((downloadCount) => {
+        downloadsComplete.then((completeDownloads) => {
             var note = {
                 id: 'sifty-finished',
                 timeoutInMs: 2000
             }
 
             // Tell user how many downloads went through.
+            var downloadCount = completeDownloads.length
             if(downloadCount > 0) {
                 browser.notifications.clear('sifty-working')
                 note.message = 'Done! (' + downloadCount + ' saved)'
@@ -55,16 +70,80 @@ function findMediaItemInTab(tab) {
         tab.id,
         {file: '/content_scripts/getItem.js'}
     ).then((items) => {
-        return {
-            'tabId': tab.id,
-            'src': !!items && !!items[0] > 0 ? items[0].src : null
+        var result = {}
+        if(!!items && !!items[0] > 0) {
+            var result = items[0]
         }
+        result.tabId = tab.id
+        return result
     }).catch((error) => {
         // This usually happens on about:* or resource:* pages, which
         // we can't execute content scripts on by design.
         console.log("Couldn't execute on " + tab.url + ", " + error)
         return null
     })
+}
+
+function downloadAll(mediaItems, callWhenComplete) {
+    // Create a bunch of download promises.
+    var downloadsFinished = []
+    for(let item of mediaItems) {
+        var download = startDownload(item).then((downloadId) => {
+            item.downloadId = downloadId
+            return finishDownload(item)
+        })
+        downloadsFinished.push(download)
+    }
+
+    // When all the download promises are complete, resolve the
+    // parent promise with the number of completed downloadsFinished.
+    Promise.all(downloadsFinished).then((finishedDownloads) => {
+        callWhenComplete(finishedDownloads)
+    })
+}
+
+// Clean the query string parameters, hostname, and any
+// characters that tend to break filepaths.
+function getFilenameFromUrl(url) {
+    var result = url.substring(0, (url.indexOf('#') == -1 ? url.length : url.indexOf('#')))
+    result = result.substring(0, (url.indexOf('?') == -1 ? url.length : url.indexOf('?')))
+    result = result.substring(result.lastIndexOf('/') + 1, url.length)
+    result = result.replace(/[|\\/&:$%@!"<>()^+=?*,]/g, '_')
+    return result
+}
+
+function startDownload(mediaItem) {
+    return browser.downloads.download({
+        url: mediaItem.src,
+        filename: getFilenameFromUrl(mediaItem.src),
+        conflictAction: 'uniquify',
+        incognito: true
+    })
+}
+
+// Finish the download by setting up the tab to close when the download completes.
+function finishDownload(mediaItem) {
+    return new Promise((resolve, reject) => {
+        // The callback passed to callWhenDownloadComplete will
+        // close the tab then resolve this promise.
+        browser.downloads.onChanged.addListener(
+            callWhenDownloadComplete(mediaItem.downloadId, function() {
+                browser.tabs.remove(mediaItem.tabId)
+                resolve(mediaItem)
+            })
+        )
+    }).catch((error) => {
+        return null
+    })
+}
+
+// Call callback() when download with the given id completes.
+function callWhenDownloadComplete(id, callback) {
+    return function(delta) {
+        if(id === delta.id && delta.state && 'complete' === delta.state.current) {
+            callback()
+        }
+    }
 }
 
 // Timeout defaults to 2 sec, set to 0 to not timeout.
@@ -82,81 +161,4 @@ function notify(note) {
             browser.notifications.clear(note.id)
         }, timeoutInMs)
     }
-}
-
-// Clean the query string parameters, hostname, and any
-// characters that tend to break filepaths.
-function getFilenameFromUrl(url) {
-    var result = url.substring(0, (url.indexOf('#') == -1 ? url.length : url.indexOf('#')))
-    result = result.substring(0, (url.indexOf('?') == -1 ? url.length : url.indexOf('?')))
-    result = result.substring(result.lastIndexOf('/') + 1, url.length)
-    result = result.replace(/[|\\/&:$%@!"<>()^+=?*,]/g, '_')
-    return result
-}
-
-function downloadAll(mediaItems, callWhenComplete) {
-    // Filter to tabs that had an item.
-    mediaItems = mediaItems.filter(item => !!item && !!item.src)
-    if(mediaItems.length <= 0) {
-        // If there are no items, resolve with 0 downloads.
-        return callWhenComplete(0)
-    }
-    
-    // Otherwise we have items, tell user we're starting downloads.
-    notify({
-        id: 'sifty-working',
-        message:'Downloading ' + mediaItems.length + ' files...',
-        timeoutInMs: 0
-    })
-
-    // Create a bunch of download promises.
-    var downloadsFinished = []
-    for(let item of mediaItems) {
-        var download = startDownload(item).then((downloadId) => {
-            item.downloadId = downloadId
-            return finishDownload(item)
-        })
-        downloadsFinished.push(download)
-    }
-
-    // When all the download promises are complete, resolve the
-    // parent promise with the number of completed downloadsFinished.
-    Promise.all(downloadsFinished).then((alldone) => {
-        callWhenComplete(downloadsFinished.length)
-    })
-}
-
-function startDownload(mediaItem) {
-    return browser.downloads.download({
-        url: mediaItem.src,
-        filename: getFilenameFromUrl(mediaItem.src),
-        conflictAction: 'uniquify',
-        incognito: true
-    })
-}
-
-// Call callback() when download with the given id completes.
-function callWhenDownloadComplete(id, callback) {
-    return function(delta) {
-        if(id === delta.id && delta.state && 'complete' === delta.state.current) {
-            callback()
-        }
-    }
-}
-
-// Finish the download by setting up the tab to close when the download completes.
-function finishDownload(mediaItem) {
-    return new Promise((resolve, reject) => {
-        // The callback passed to callWhenDownloadComplete will
-        // close the tab then resolve this promise.
-        browser.downloads.onChanged.addListener(
-            callWhenDownloadComplete(mediaItem.downloadId, function() {
-                browser.tabs.remove(mediaItem.tabId)
-                resolve(mediaItem.src)
-            })
-        )
-    }).catch((error) => {
-        console.log("Couldn't download: " + error)
-        return null
-    })
 }
