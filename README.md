@@ -1,10 +1,6 @@
-# sifty
+# [](https://raw.githubusercontent.com/keeler/sifty/master/icons/sifty.png) sifty
 Browser extension to Save Items From Tabs, Yo!
 
-## Running Locally
-Clone the source, and cd into the source directory.
-```
-npm install --global web-ext
-web-ext run
-```
+Searches open tabs for media (images, audio, video), saves them, and closes the tabs.
 
+Get it as a [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/sifty/).
