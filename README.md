@@ -16,5 +16,5 @@ Searches open tabs for media (images, audio, video), saves them, and closes the 
 
 Get it as a [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/sifty/).
 
-# Developer Notes
+### Developer Notes
 - [Debugging Firefox WebExtensions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Debugging)
