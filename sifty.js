@@ -1,3 +1,30 @@
+// When installed as a temporary extension, open the test pages in new tabs.
+browser.runtime.onInstalled.addListener((details) => {
+    if (details.temporary) {
+        // Add message hooks for integration testing.
+        browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.message === "downloadMediaItems") {
+                downloadMediaItems().then((finishedDownloads) => {
+                    sendResponse({
+                        response: "done",
+                        finishedDownloads: finishedDownloads
+                    })
+                })
+            }
+            // Return true so sendResponse() can be asynchronous.
+            // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
+            return true 
+        });
+
+        // Load test pages to run tests.
+        browser.windows.create({
+            url: [
+                browser.extension.getURL("test/integration.html")
+            ]
+        });
+    }
+});
+
 // Wait for the user to click the button in their toolbar.
 browser.browserAction.onClicked.addListener(handleToolbarButtonClicked)
 
@@ -7,7 +34,7 @@ function handleToolbarButtonClicked() {
 
 function downloadMediaItems() {
     // Get all tabs in current window.
-    getTabsInWindow().then((tabs) => {
+    return getTabsInWindow().then((tabs) => {
         // Search tabs for items
         var mediaItemsFound = []
         for(var tab of tabs) {
@@ -36,24 +63,28 @@ function downloadMediaItems() {
             })
         })
         
-        // Wait for all the downloads to complete.
-        downloadsComplete.then((completeDownloads) => {
-            var note = {
-                id: 'sifty-finished',
-                timeoutInMs: 2000
-            }
+        return new Promise((resolve, error) => {
+            // Wait for all the downloads to complete.
+            downloadsComplete.then((completeDownloads) => {
+                var note = {
+                    id: 'sifty-finished',
+                    timeoutInMs: 2000
+                }
 
-            // Tell user how many downloads went through.
-            var downloadCount = completeDownloads.length
-            if(downloadCount > 0) {
-                browser.notifications.clear('sifty-working')
-                note.message = 'Done! (' + downloadCount + ' saved)'
-            }
-            else {
-                note.message = 'No media files to download'
-            }
+                // Tell user how many downloads went through.
+                var downloadCount = completeDownloads.length
+                if(downloadCount > 0) {
+                    browser.notifications.clear('sifty-working')
+                    note.message = 'Done! (' + downloadCount + ' saved)'
+                }
+                else {
+                    note.message = 'No media files to download'
+                }
 
-            notify(note)
+                notify(note)
+                
+                resolve(completeDownloads)
+            })
         })
     })
 }
@@ -103,7 +134,7 @@ function downloadAll(mediaItems, callWhenComplete) {
 }
 
 // Thanks nginx! https://github.com/nginx/nginx/blob/master/conf/mime.types
-mimeTypeToExtension = {
+let mimeTypeToExtension = {
     'text/html': 'html',
     'text/css': 'css',
     'text/xml': 'xml',

@@ -15,8 +15,7 @@
         "tabs",
         "downloads",
         "notifications",
-        "http://*/",
-        "https://*/"
+        "<all_urls>"
     ],
 
     "browser_action": {
