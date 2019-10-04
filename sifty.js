@@ -4,7 +4,7 @@ browser.runtime.onInstalled.addListener((details) => {
         // Add message hooks for integration testing.
         browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.message === "downloadMediaItems") {
-                downloadMediaItems().then((finishedDownloads) => {
+                downloadMediaItemsInCurrentWindow().then((finishedDownloads) => {
                     sendResponse({
                         response: "done",
                         finishedDownloads: finishedDownloads
@@ -29,26 +29,35 @@ browser.runtime.onInstalled.addListener((details) => {
 browser.browserAction.onClicked.addListener(handleToolbarButtonClicked)
 
 function handleToolbarButtonClicked() {
-    downloadMediaItems()
+    downloadMediaItemsInCurrentWindow()
 }
 
-function downloadMediaItems() {
-    // Get all tabs in current window.
-    return getTabsInWindow().then(downloadItemsInTabs)
+function downloadMediaItemsInCurrentWindow() {
+    return getTabsInCurrentWindow().then(downloadItemsInTabs)
 }
 
-function getTabsInWindow() {
+function getTabsInCurrentWindow() {
     return browser.tabs.query({currentWindow: true})
 }
 
 function downloadItemsInTabs(tabs) {
-    // Search tabs for items
     let mediaItemsFound = findMediaItemsInTabs(tabs)
+    return downloadMediaItems(mediaItemsFound)
+}
 
+function findMediaItemsInTabs(tabs) {
+    var mediaItemsFound = []
+    for(var tab of tabs) {
+        mediaItemsFound.push(findMediaItemInTab(tab))
+    }
+    return mediaItemsFound
+}
+
+function downloadMediaItems(mediaItemPromises) {
     // Make a promise for all the downloads to complete.
     var downloadsComplete = new Promise((resolveAllDownloadsComplete, reject) => {
         // Only start once all the tabs have been scanned for items.
-        Promise.all(mediaItemsFound).then((mediaItems) => {
+        Promise.all(mediaItemPromises).then((mediaItems) => {
             // Filter to tabs that had an item.
             mediaItems = mediaItems.filter(item => !!item && !!item.src)
             if(mediaItems.length <= 0) {
@@ -90,14 +99,6 @@ function downloadItemsInTabs(tabs) {
             resolve(completeDownloads)
         })
     })
-}
-
-function findMediaItemsInTabs(tabs) {
-    var mediaItemsFound = []
-    for(var tab of tabs) {
-        mediaItemsFound.push(findMediaItemInTab(tab))
-    }
-    return mediaItemsFound
 }
 
 function findMediaItemInTab(tab) {
