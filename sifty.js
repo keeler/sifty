@@ -36,10 +36,7 @@ function downloadMediaItems() {
     // Get all tabs in current window.
     return getTabsInWindow().then((tabs) => {
         // Search tabs for items
-        var mediaItemsFound = []
-        for(var tab of tabs) {
-            mediaItemsFound.push(findMediaItemInTab(tab))
-        }
+        let mediaItemsFound = findMediaItemsInTabs(tabs)
 
         // Make a promise for all the downloads to complete.
         var downloadsComplete = new Promise((resolveAllDownloadsComplete, reject) => {
@@ -91,6 +88,14 @@ function downloadMediaItems() {
 
 function getTabsInWindow() {
     return browser.tabs.query({currentWindow: true})
+}
+
+function findMediaItemsInTabs(tabs) {
+    var mediaItemsFound = []
+    for(var tab of tabs) {
+        mediaItemsFound.push(findMediaItemInTab(tab))
+    }
+    return mediaItemsFound
 }
 
 function findMediaItemInTab(tab) {
