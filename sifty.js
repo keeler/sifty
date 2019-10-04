@@ -1,29 +1,7 @@
-// When installed as a temporary extension, open the test pages in new tabs.
-browser.runtime.onInstalled.addListener((details) => {
-    if (details.temporary) {
-        // Add message hooks for integration testing.
-        browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            if (request.message === "downloadMediaItems") {
-                downloadMediaItemsInCurrentWindow().then((finishedDownloads) => {
-                    sendResponse({
-                        response: "done",
-                        finishedDownloads: finishedDownloads
-                    })
-                })
-            }
-            // Return true so sendResponse() can be asynchronous.
-            // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
-            return true 
-        });
+import TestHelper from './test/utils/TestHelper.js'
 
-        // Load test pages to run tests.
-        browser.windows.create({
-            url: [
-                browser.extension.getURL("test/integration.html")
-            ]
-        });
-    }
-});
+// Allow the integration tests to call the download media items function.
+TestHelper.addHooksForIntegrationTests(downloadMediaItemsInCurrentWindow)
 
 // Wait for the user to click the button in their toolbar.
 browser.browserAction.onClicked.addListener(handleToolbarButtonClicked)
