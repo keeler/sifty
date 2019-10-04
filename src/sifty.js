@@ -1,4 +1,4 @@
-import TestHelper from './test/utils/TestHelper.js'
+import TestHelper from '../test/utils/TestHelper.js'
 
 // Allow the integration tests to call the download media items function.
 TestHelper.addHooksForIntegrationTests(downloadMediaItemsInCurrentWindow)
@@ -85,7 +85,7 @@ function findMediaItemInTab(tab) {
     // .webm, .mp3 file) in the tab. if any exists.
     return browser.tabs.executeScript(
         tab.id,
-        {file: '/content_scripts/getItem.js'}
+        {file: '/src/content_scripts/getItem.js'}
     ).then((items) => {
         var result = {}
         if(!!items && !!items[0] > 0) {

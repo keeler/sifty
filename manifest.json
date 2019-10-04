@@ -26,6 +26,6 @@
     },
 
     "background": {
-        "page": "background.html"
+        "page": "src/background.html"
     }
 }
