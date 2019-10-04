@@ -34,60 +34,62 @@ function handleToolbarButtonClicked() {
 
 function downloadMediaItems() {
     // Get all tabs in current window.
-    return getTabsInWindow().then((tabs) => {
-        // Search tabs for items
-        let mediaItemsFound = findMediaItemsInTabs(tabs)
-
-        // Make a promise for all the downloads to complete.
-        var downloadsComplete = new Promise((resolveAllDownloadsComplete, reject) => {
-            // Only start once all the tabs have been scanned for items.
-            Promise.all(mediaItemsFound).then((mediaItems) => {
-                // Filter to tabs that had an item.
-                mediaItems = mediaItems.filter(item => !!item && !!item.src)
-                if(mediaItems.length <= 0) {
-                    // If there are no items, resolve with 0 downloads.
-                    return resolveAllDownloadsComplete([])
-                }
-                
-                // Otherwise we have items, tell user we're starting downloads.
-                notify({
-                    id: 'sifty-working',
-                    message:'Downloading ' + mediaItems.length + ' files...',
-                    timeoutInMs: 0
-                })
-
-                return downloadAll(mediaItems, resolveAllDownloadsComplete)
-            })
-        })
-        
-        return new Promise((resolve, error) => {
-            // Wait for all the downloads to complete.
-            downloadsComplete.then((completeDownloads) => {
-                var note = {
-                    id: 'sifty-finished',
-                    timeoutInMs: 2000
-                }
-
-                // Tell user how many downloads went through.
-                var downloadCount = completeDownloads.length
-                if(downloadCount > 0) {
-                    browser.notifications.clear('sifty-working')
-                    note.message = 'Done! (' + downloadCount + ' saved)'
-                }
-                else {
-                    note.message = 'No media files to download'
-                }
-
-                notify(note)
-                
-                resolve(completeDownloads)
-            })
-        })
-    })
+    return getTabsInWindow().then(downloadItemsInTabs)
 }
 
 function getTabsInWindow() {
     return browser.tabs.query({currentWindow: true})
+}
+
+function downloadItemsInTabs(tabs) {
+    // Search tabs for items
+    let mediaItemsFound = findMediaItemsInTabs(tabs)
+
+    // Make a promise for all the downloads to complete.
+    var downloadsComplete = new Promise((resolveAllDownloadsComplete, reject) => {
+        // Only start once all the tabs have been scanned for items.
+        Promise.all(mediaItemsFound).then((mediaItems) => {
+            // Filter to tabs that had an item.
+            mediaItems = mediaItems.filter(item => !!item && !!item.src)
+            if(mediaItems.length <= 0) {
+                // If there are no items, resolve with 0 downloads.
+                return resolveAllDownloadsComplete([])
+            }
+            
+            // Otherwise we have items, tell user we're starting downloads.
+            notify({
+                id: 'sifty-working',
+                message:'Downloading ' + mediaItems.length + ' files...',
+                timeoutInMs: 0
+            })
+
+            return downloadAll(mediaItems, resolveAllDownloadsComplete)
+        })
+    })
+    
+    return new Promise((resolve, error) => {
+        // Wait for all the downloads to complete.
+        downloadsComplete.then((completeDownloads) => {
+            var note = {
+                id: 'sifty-finished',
+                timeoutInMs: 2000
+            }
+
+            // Tell user how many downloads went through.
+            var downloadCount = completeDownloads.length
+            if(downloadCount > 0) {
+                browser.notifications.clear('sifty-working')
+                note.message = 'Done! (' + downloadCount + ' saved)'
+            }
+            else {
+                note.message = 'No media files to download'
+            }
+
+            notify(note)
+            
+            resolve(completeDownloads)
+        })
+    })
 }
 
 function findMediaItemsInTabs(tabs) {
