@@ -26,6 +26,8 @@
     },
 
     "background": {
-        "page": "src/background.html"
+        "scripts": [
+            "background.js"
+        ]
     }
 }
