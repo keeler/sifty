@@ -1,5 +1,3 @@
-import TestHelper from './test/utils/TestHelper.js'
-
 // When installed as a temporary extension, open the test pages in new tabs.
 browser.runtime.onInstalled.addListener((details) => {
   if (details.temporary) {
@@ -116,12 +114,12 @@ async function findMediaItemInTab (tab) {
 
   return browser.tabs.sendMessage(
     tab.id,
-    {message: 'getItem'}
+    { message: 'getItem' }
   ).then(mediaItem => {
     return mediaItem
   }).catch((error) => {
     console.log(error)
-  });
+  })
 }
 
 function downloadAll (mediaItems, callWhenComplete) {
