@@ -3,26 +3,26 @@ import * as _ from 'lodash'
 // When installed as a temporary extension, open the test pages in new tabs.
 browser.runtime.onInstalled.addListener((details) => {
   if (details.temporary) {
-    browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      // Used for integration testing.
-      if (request.message === 'downloadMediaItems') {
-        downloadMediaItemsInCurrentWindow().then((finishedDownloads) => {
-          sendResponse({ finishedDownloads: finishedDownloads })
-        })
-      } else if (request.message === 'getTabId') {
-        sendResponse({ tabId: sender.tab.id })
-      }
-      // Return true so sendResponse() can be asynchronous.
-      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
-      return true
-    })
-    
     browser.windows.create({
       url: [
         browser.extension.getURL('test/integration.html')
       ]
     })
   }
+})
+
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.message === 'downloadMediaItems') {
+    // Used for integration testing.
+    downloadMediaItemsInCurrentWindow().then((finishedDownloads) => {
+      sendResponse({ finishedDownloads: finishedDownloads })
+    })
+  } else if (request.message === 'getTabId') {
+    sendResponse({ tabId: sender.tab.id })
+  }
+  // Return true so sendResponse() can be asynchronous.
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
+  return true
 })
 
 // Wait for the user to click the button in their toolbar.
