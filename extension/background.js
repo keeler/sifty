@@ -1,4 +1,5 @@
 import * as _ from 'lodash'
+import MediaItem from './mediaItem'
 import Downloader from './downloader'
 
 // When installed as a temporary extension, open the test pages in new tabs.
@@ -53,9 +54,6 @@ function findMediaItemsInTabs (tabs) {
 }
 
 async function findMediaItemInTab (tab) {
-  // Execute a script in the tab find and return
-  // the source of the media item (e.g. a .jpeg,
-  // .webm, .mp3 file) in the tab. if any exists.
   await browser.tabs.executeScript(
     tab.id,
     { file: '/content_scripts/getItem.js' }
@@ -68,8 +66,8 @@ async function findMediaItemInTab (tab) {
   return browser.tabs.sendMessage(
     tab.id,
     { message: 'getItem' }
-  ).then(mediaItem => {
-    return mediaItem
+  ).then(response => {
+    return new MediaItem(response.src, response.mimeType, response.tabId)
   }).catch((error) => {
     console.log(error)
   })
