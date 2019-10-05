@@ -21,6 +21,7 @@ const config = {
   context: path.resolve(__dirname, './extension'),
   entry: {
     'background': './background.js',
+    'content_scripts/getItem': './content_scripts/getItem.js'
   },
   output: {
     filename: '[name].js',
@@ -41,7 +42,6 @@ const config = {
       multipleCopy('manifest.json')
         .concat([
           {from: 'icons/*'},
-          {from: 'content_scripts/*'}
         ])
     ),
   ],
