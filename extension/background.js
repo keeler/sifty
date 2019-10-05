@@ -101,25 +101,27 @@ function downloadMediaItems (mediaItemPromises) {
   })
 }
 
-function findMediaItemInTab (tab) {
+async function findMediaItemInTab (tab) {
   // Execute a script in the tab find and return
   // the source of the media item (e.g. a .jpeg,
   // .webm, .mp3 file) in the tab. if any exists.
-  return browser.tabs.executeScript(
+  await browser.tabs.executeScript(
     tab.id,
     { file: '/content_scripts/getItem.js' }
-  ).then((items) => {
-    var result = {}
-    if (!!items && !!items[0] > 0) {
-      result = items[0]
-    }
-    return result
-  }).catch((error) => {
+  ).catch((error) => {
     // This usually happens on about:* or resource:* pages, which
     // we can't execute content scripts on by design.
     console.log('Couldn\'t execute on ' + tab.url + ', ' + error)
-    return null
   })
+
+  return browser.tabs.sendMessage(
+    tab.id,
+    {message: 'getItem'}
+  ).then(mediaItem => {
+    return mediaItem
+  }).catch((error) => {
+    console.log(error)
+  });
 }
 
 function downloadAll (mediaItems, callWhenComplete) {

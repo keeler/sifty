@@ -25,16 +25,15 @@
       }
     }
 
-    return null
+    return {}
   }
 
-  function processThisTab () {
-    var mediaItem = getItem()
-    if (!mediaItem) {
-      return null
+  browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.message === 'getItem') {
+      sendResponse(getItem())
     }
-    return mediaItem
-  }
-
-  return processThisTab()
+    // Return true so sendResponse() can be asynchronous.
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
+    return true
+  })
 })()
