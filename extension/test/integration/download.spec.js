@@ -9,7 +9,6 @@ describe('Download integration tests:', () => {
   })
 
   it('Tabs should close after downloaded', async () => {
-    console.log(TestHelper)
     const tabsBefore = await browser.tabs.query({ currentWindow: true })
     const numTabsBefore = tabsBefore.length
 
