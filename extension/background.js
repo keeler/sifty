@@ -1,8 +1,10 @@
+import * as _ from 'lodash'
+
 // When installed as a temporary extension, open the test pages in new tabs.
 browser.runtime.onInstalled.addListener((details) => {
   if (details.temporary) {
-    // Add message hooks for integration testing.
     browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      // Used for integration testing.
       if (request.message === 'downloadMediaItems') {
         downloadMediaItemsInCurrentWindow().then((finishedDownloads) => {
           sendResponse({ finishedDownloads: finishedDownloads })
@@ -14,8 +16,7 @@ browser.runtime.onInstalled.addListener((details) => {
       // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
       return true
     })
-
-    // Load test pages to run tests.
+    
     browser.windows.create({
       url: [
         browser.extension.getURL('test/integration.html')
@@ -45,11 +46,9 @@ function downloadItemsInTabs (tabs) {
 }
 
 function findMediaItemsInTabs (tabs) {
-  var mediaItemsFound = []
-  for (var tab of tabs) {
-    mediaItemsFound.push(findMediaItemInTab(tab))
-  }
-  return mediaItemsFound
+  return _.map(tabs, (tab) => {
+    return findMediaItemInTab(tab)
+  })
 }
 
 function downloadMediaItems (mediaItemPromises) {

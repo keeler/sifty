@@ -13,7 +13,9 @@
     "firefox:prod": "npx web-ext run --sourceDir=release/build",
     "firefox:dev": "npx web-ext run --sourceDir=build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.15"
+  },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.4",
     "eslint": "^6.5.1",

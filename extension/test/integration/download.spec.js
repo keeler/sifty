@@ -1,3 +1,5 @@
+import * as _ from 'lodash'
+
 import TestHelper from '../utils/TestHelper.js'
 
 // For linter to be quiet.
@@ -29,13 +31,10 @@ describe('Download integration tests:', () => {
     const finishedDownloads = await TestHelper.downloadUsingSifty()
 
     expect(finishedDownloads.length).toEqual(mediaItemUrls.length)
-    const downloadUrls = []
-    for (const download of finishedDownloads) {
-      downloadUrls.push(download.src)
-    }
-    for (const url of mediaItemUrls) {
+    const downloadUrls = _.map(finishedDownloads, 'src')
+    _.forEach(mediaItemUrls, (url) => {
       expect(downloadUrls).toContain(url)
-    }
+    })
 
     TestHelper.clearDownloads(finishedDownloads)
   })
