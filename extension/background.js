@@ -1,7 +1,30 @@
 import TestHelper from './test/utils/TestHelper.js'
 
-// Allow the integration tests to call the download media items function.
-TestHelper.addHooksForIntegrationTests(downloadMediaItemsInCurrentWindow)
+// When installed as a temporary extension, open the test pages in new tabs.
+browser.runtime.onInstalled.addListener((details) => {
+  if (details.temporary) {
+    // Add message hooks for integration testing.
+    browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.message === 'downloadMediaItems') {
+        downloadMediaItemsInCurrentWindow().then((finishedDownloads) => {
+          sendResponse({ finishedDownloads: finishedDownloads })
+        })
+      } else if (request.message === 'getTabId') {
+        sendResponse({ tabId: sender.tab.id })
+      }
+      // Return true so sendResponse() can be asynchronous.
+      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
+      return true
+    })
+
+    // Load test pages to run tests.
+    browser.windows.create({
+      url: [
+        browser.extension.getURL('test/integration.html')
+      ]
+    })
+  }
+})
 
 // Wait for the user to click the button in their toolbar.
 browser.browserAction.onClicked.addListener(handleToolbarButtonClicked)
@@ -90,7 +113,6 @@ function findMediaItemInTab (tab) {
     if (!!items && !!items[0] > 0) {
       result = items[0]
     }
-    result.tabId = tab.id
     return result
   }).catch((error) => {
     // This usually happens on about:* or resource:* pages, which

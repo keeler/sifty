@@ -1,4 +1,12 @@
 (async function () {
+  const tabId = await browser.runtime.sendMessage({
+    message: 'getTabId'
+  }).then(response => {
+    return response.tabId
+  }, (error) => {
+    console.log(error)
+  })
+
   const supportedMimeTypes = [
     'image',
     'video',
@@ -10,6 +18,7 @@
     for (var mimeType of supportedMimeTypes) {
       if (document.contentType.indexOf(mimeType + '/') === 0) {
         return {
+          tabId: tabId,
           src: document.URL,
           mimeType: document.contentType
         }
