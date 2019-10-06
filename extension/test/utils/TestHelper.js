@@ -4,7 +4,7 @@ const TestHelper = {}
 
 TestHelper.testPageUrls = [
   browser.extension.getURL('test/unit/unit.html'),
-  browser.extension.getURL('test/integration/integration.html'),
+  browser.extension.getURL('test/integration/integration.html')
 ]
 
 TestHelper.initTestsIfTemporaryInstallation = function (activateSifty) {

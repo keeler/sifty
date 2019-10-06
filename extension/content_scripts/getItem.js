@@ -1,18 +1,13 @@
-(async function () {
-  const supportedMimeTypes = [
-    'image',
-    'video',
-    'audio'
-  ]
+import MimeType from '../core/mimeType'
 
+(async function () {
   // Grab the source of the media file (image, video, audio, etc.)
   function getItem () {
-    for (var mimeType of supportedMimeTypes) {
-      if (document.contentType.indexOf(mimeType + '/') === 0) {
-        return {
-          src: document.URL,
-          mimeType: document.contentType
-        }
+    const mimeType = document.contentType
+    if (MimeType.isSupported(mimeType)) {
+      return {
+        src: document.URL,
+        mimeType: document.contentType
       }
     }
     return {}

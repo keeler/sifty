@@ -1,7 +1,7 @@
 import MimeType from '../../core/mimeType'
 
 // For linter to be quiet.
-/* global describe, afterEach, it, expect */
+/* global describe, it, expect */
 
 describe('Mime type management works:', () => {
   it('Check supported mime types', () => {

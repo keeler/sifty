@@ -12,15 +12,6 @@ MimeType.isSupported = function (mimeType) {
 
 // Thanks nginx! https://github.com/nginx/nginx/blob/master/conf/mime.types
 const mimeTypeToExtensionMap = {
-  'text/html': 'html',
-  'text/css': 'css',
-  'text/xml': 'xml',
-  'text/mathml': 'mml',
-  'text/plain': 'txt',
-  'text/vnd.sun.j2me.app-descriptor': 'jad',
-  'text/vnd.wap.wml': 'wml',
-  'text/x-component': 'htc',
-
   'image/gif': 'gif',
   'image/jpeg': 'jpeg',
   'image/png': 'png',
