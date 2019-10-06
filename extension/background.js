@@ -32,15 +32,23 @@ function findMediaItemsInTabs (tabs) {
 }
 
 async function findMediaItemInTab (tab) {
+  await injectGetItemScriptIntoTab(tab)
+  return requestMediaItemInfoFromTab(tab)
+}
+
+async function injectGetItemScriptIntoTab (tab) {
   await browser.tabs.executeScript(
     tab.id,
     { file: '/content_scripts/getItem.js' }
   ).catch((error) => {
-    // This usually happens on about:* or resource:* pages, which
-    // we can't execute content scripts on by design.
+    // This usually happens on about:* or resource:* pages,
+    // which can't execute content scripts by design.
     console.log('Couldn\'t execute on ' + tab.url + ', ' + error)
   })
+}
 
+function requestMediaItemInfoFromTab(tab) {
+  // Expects the tab to have the getItem.js content script available.
   return browser.tabs.sendMessage(
     tab.id,
     { message: 'getItem' }
