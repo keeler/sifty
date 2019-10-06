@@ -15,7 +15,7 @@ Downloader.downloadMediaItems = function (mediaItemPromises) {
       // Otherwise we have items, tell user we're starting downloads.
       notify({
         id: 'sifty-working',
-        message: 'Downloading ' + mediaItems.length + ' files...',
+        message: `Downloading ${mediaItems.length} files...`,
         timeoutInMs: 0
       })
 
@@ -35,7 +35,7 @@ Downloader.downloadMediaItems = function (mediaItemPromises) {
       var downloadCount = completeDownloads.length
       if (downloadCount > 0) {
         browser.notifications.clear('sifty-working')
-        note.message = 'Done! (' + downloadCount + ' saved)'
+        note.message = `Done! (${downloadCount} saved)`
       } else {
         note.message = 'No media files to download'
       }

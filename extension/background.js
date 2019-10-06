@@ -43,11 +43,11 @@ async function injectGetItemScriptIntoTab (tab) {
   ).catch((error) => {
     // This usually happens on about:* or resource:* pages,
     // which can't execute content scripts by design.
-    console.log('Couldn\'t execute on ' + tab.url + ', ' + error)
+    console.log(`Couldn't execute on ${tab.url}, ${error}`)
   })
 }
 
-function requestMediaItemInfoFromTab(tab) {
+function requestMediaItemInfoFromTab (tab) {
   // Expects the tab to have the getItem.js content script available.
   return browser.tabs.sendMessage(
     tab.id,
