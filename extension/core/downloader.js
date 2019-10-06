@@ -1,3 +1,5 @@
+import Notify from './notify'
+
 const Downloader = {}
 
 Downloader.downloadMediaItems = function (mediaItemPromises) {
@@ -12,12 +14,7 @@ Downloader.downloadMediaItems = function (mediaItemPromises) {
         return resolve([])
       }
 
-      // Otherwise we have items, tell user we're starting downloads.
-      notify({
-        id: 'sifty-working',
-        message: `Downloading ${mediaItems.length} files...`,
-        timeoutInMs: 0
-      })
+      Notify.workInProgress(mediaItems.length)
 
       return downloadAll(mediaItems, resolve)
     })
@@ -26,22 +23,7 @@ Downloader.downloadMediaItems = function (mediaItemPromises) {
   return new Promise((resolve, reject) => {
     // Wait for all the downloads to complete.
     downloadsComplete.then((completeDownloads) => {
-      var note = {
-        id: 'sifty-finished',
-        timeoutInMs: 2000
-      }
-
-      // Tell user how many downloads went through.
-      var downloadCount = completeDownloads.length
-      if (downloadCount > 0) {
-        browser.notifications.clear('sifty-working')
-        note.message = `Done! (${downloadCount} saved)`
-      } else {
-        note.message = 'No media files to download'
-      }
-
-      notify(note)
-
+      Notify.workComplete(completeDownloads.length)
       resolve(completeDownloads)
     })
   })
@@ -97,23 +79,6 @@ function callWhenDownloadComplete (id, callback) {
     if (id === delta.id && delta.state && delta.state.current === 'complete') {
       callback()
     }
-  }
-}
-
-// Timeout defaults to 2 sec, set to 0 to not timeout.
-function notify (note) {
-  browser.notifications.create(note.id, {
-    type: 'basic',
-    iconUrl: browser.extension.getURL('icons/sifty.svg'),
-    title: 'Save Items From Tabs, Yo!',
-    message: note.message
-  })
-
-  var timeoutInMs = (typeof note.timeoutInMs !== 'undefined') ? note.timeoutInMs : 2000
-  if (timeoutInMs !== 0) {
-    setTimeout(function () {
-      browser.notifications.clear(note.id)
-    }, timeoutInMs)
   }
 }
 
