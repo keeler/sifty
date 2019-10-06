@@ -19,8 +19,6 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     downloadMediaItemsInCurrentWindow().then((finishedDownloads) => {
       sendResponse({ finishedDownloads: finishedDownloads })
     })
-  } else if (request.message === 'getTabId') {
-    sendResponse({ tabId: sender.tab.id })
   }
   // Return true so sendResponse() can be asynchronous.
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
@@ -67,7 +65,7 @@ async function findMediaItemInTab (tab) {
     tab.id,
     { message: 'getItem' }
   ).then(response => {
-    return new MediaItem(response.src, response.mimeType, response.tabId)
+    return new MediaItem(response.src, response.mimeType, tab.id)
   }).catch((error) => {
     console.log(error)
   })
