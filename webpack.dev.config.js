@@ -13,9 +13,7 @@ const plugins = [
       context: '../',
       flatten: true,
     },
-    {from: 'test/resources/**'},
-    {from: 'test/utils/**'},
-    {from: 'test/*'}
+    {from: 'test/**'}
   ]),
 ];
 

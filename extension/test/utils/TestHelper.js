@@ -1,4 +1,10 @@
+import * as _ from 'lodash'
+
 const TestHelper = {}
+
+TestHelper.testPageUrls = [
+  browser.extension.getURL('test/integration/integration.html'),
+]
 
 TestHelper.initTestsIfTemporaryInstallation = function (activateSifty) {
   browser.runtime.onInstalled.addListener((details) => {
@@ -18,9 +24,7 @@ TestHelper.initTestsIfTemporaryInstallation = function (activateSifty) {
 
       // Open the test pages which will run the tests.
       browser.windows.create({
-        url: [
-          browser.extension.getURL('test/integration.html')
-        ]
+        url: TestHelper.testPageUrls
       })
     }
   })
@@ -28,11 +32,11 @@ TestHelper.initTestsIfTemporaryInstallation = function (activateSifty) {
 
 TestHelper.closeAllTabsExceptTestPages = async function () {
   const tabs = await browser.tabs.query({ currentWindow: true })
-  for (const tab of tabs) {
-    if (tab.url !== browser.extension.getURL('/test/integration.html')) {
+  _.forEach(tabs, async (tab) => {
+    if (!_.includes(TestHelper.testPageUrls, tab.url)) {
       await browser.tabs.remove(tab.id)
     }
-  }
+  })
 }
 
 const mediaItemUrls = [
