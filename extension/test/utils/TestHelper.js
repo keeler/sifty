@@ -49,7 +49,7 @@ const mediaItemUrls = [
 ]
 
 TestHelper.openMediaItemsInTabs = async function () {
-  _.forEach(mediaItemUrls, (url) => {
+  _.forEach(mediaItemUrls, async (url) => {
     await browser.tabs.create({ url: url })
   })
   return mediaItemUrls
