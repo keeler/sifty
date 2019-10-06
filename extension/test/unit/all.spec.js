@@ -1,0 +1,1 @@
+import './mimeType.spec'

@@ -3,6 +3,7 @@ import * as _ from 'lodash'
 const TestHelper = {}
 
 TestHelper.testPageUrls = [
+  browser.extension.getURL('test/unit/unit.html'),
   browser.extension.getURL('test/integration/integration.html'),
 ]
 
