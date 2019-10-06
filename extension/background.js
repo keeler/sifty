@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
-import MediaItem from './mediaItem'
-import Downloader from './downloader'
+import MediaItem from './core/mediaItem'
+import Downloader from './core/downloader'
 import TestHelper from './test/utils/TestHelper'
 
 TestHelper.initTestsIfTemporaryInstallation(downloadMediaItemsInCurrentWindow)
