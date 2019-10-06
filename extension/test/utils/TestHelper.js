@@ -1,5 +1,31 @@
 const TestHelper = {}
 
+TestHelper.initTestsIfTemporaryInstallation = function (activateSifty) {
+  browser.runtime.onInstalled.addListener((details) => {
+    // When installed as a temporary extension...
+    if (details.temporary) {
+      // Listen for messages from the test and activate sifty in response.
+      browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.message === 'activateDownloadForIntegrationTest') {
+          activateSifty().then((finishedDownloads) => {
+            sendResponse({ finishedDownloads: finishedDownloads })
+          })
+        }
+        // Return true so sendResponse() can be asynchronous.
+        // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
+        return true
+      })
+
+      // Open the test pages which will run the tests.
+      browser.windows.create({
+        url: [
+          browser.extension.getURL('test/integration.html')
+        ]
+      })
+    }
+  })
+}
+
 TestHelper.closeAllTabsExceptTestPages = async function () {
   const tabs = await browser.tabs.query({ currentWindow: true })
   for (const tab of tabs) {
@@ -35,7 +61,7 @@ TestHelper.clearDownloads = async function (finishedDownloads) {
 
 TestHelper.downloadUsingSifty = async function () {
   const finishedDownloads = await browser.runtime.sendMessage({
-    message: 'downloadMediaItems'
+    message: 'activateDownloadForIntegrationTest'
   }).then((response) => {
     return response.finishedDownloads
   }, (error) => {
