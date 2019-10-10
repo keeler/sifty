@@ -18,20 +18,20 @@ class MediaItem {
 }
 
 function getFilenameFromUrl (url) {
-  const sansAnchor = trimAfter(url, '#')
-  const sansQuery = trimAfter(sansAnchor, '?')
-  const filename = everythingAfter(sansQuery, '/')
+  const sansAnchor = trimAfterAndIncluding(url, '#')
+  const sansQuery = trimAfterAndIncluding(sansAnchor, '?')
+  const filename = trimBeforeAndIncluding(sansQuery, '/')
   return replaceIllegalFilenameChars(filename)
 }
 
-function trimAfter (originalString, stringToFind) {
-  const index = originalString.indexOf(stringToFind)
-  return index === -1 ? originalString : originalString.substring(0, index)
+function trimAfterAndIncluding (str, substr) {
+  const index = str.indexOf(substr)
+  return index === -1 ? str : str.substring(0, index)
 }
 
-function everythingAfter (originalString, stringToFind) {
-  const index = originalString.lastIndexOf(stringToFind)
-  return originalString.substring(index + 1, originalString.length)
+function trimBeforeAndIncluding (str, substr) {
+  const index = str.lastIndexOf(substr)
+  return index === -1 ? str : str.substring(index + 1, str.length)
 }
 
 function replaceIllegalFilenameChars (filename) {
@@ -39,24 +39,19 @@ function replaceIllegalFilenameChars (filename) {
 }
 
 function getExtensionFromFilename (filename) {
-  return everythingAfter(filename, '.')
+  return trimBeforeAndIncluding(filename, '.')
 }
 
 function cleanExtensionBasedOnMimeType (filename, mimeType) {
   const givenExtension = getExtensionFromFilename(filename)
   const mimeExtension = MimeType.getFileExtension(mimeType)
 
-  const filenameWithoutExtension = everythingBefore(filename, `.${givenExtension}`)
+  const filenameWithoutExtension = trimAfterAndIncluding(filename, `.${givenExtension}`)
   if (_.isNil(filenameWithoutExtension) ||
       _.isEmpty(filenameWithoutExtension)) {
     throw new Error('Filename cannot be empty.')
   }
   return `${filenameWithoutExtension}.${mimeExtension}`
-}
-
-function everythingBefore (originalString, stringToFind) {
-  const index = originalString.lastIndexOf(stringToFind)
-  return originalString.substring(0, index)
 }
 
 export default MediaItem
