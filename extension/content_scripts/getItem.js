@@ -10,7 +10,7 @@ import MimeType from '../core/mimeType'
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#Sending_an_asynchronous_response_using_sendResponse
     return true
   })
-  
+
   // Grab the source of the media file (image, video, audio, etc.)
   function getItem () {
     const mimeType = document.contentType
