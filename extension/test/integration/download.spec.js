@@ -3,11 +3,20 @@ import * as _ from 'lodash'
 import TestHelper from '../utils/TestHelper.js'
 
 // For linter to be quiet.
-/* global describe, afterEach, it, expect */
+/* global describe, beforeEach, afterEach, it, expect */
 
 describe('Download integration tests:', () => {
+  beforeEach(async function () {
+    TestHelper.closeAllTabsExceptTestPages()
+  })
+
   afterEach(async function () {
     TestHelper.closeAllTabsExceptTestPages()
+  })
+
+  it('Handles no downloads gracefully', async () => {
+    const finishedDownloads = await TestHelper.downloadUsingSifty()
+    expect(finishedDownloads.length).toEqual(0)
   })
 
   it('Tabs should close after downloaded', async () => {

@@ -13,7 +13,7 @@ module.exports = {
     path: path.resolve(__dirname, './release/build'),
   },
   target: 'web',
-  mode: 'production',
+  mode: 'none',
   plugins,
   // Prefer size and performance
   devtool: 'none',

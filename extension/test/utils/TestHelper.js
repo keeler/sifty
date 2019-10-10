@@ -8,6 +8,10 @@ TestHelper.testPageUrls = [
 ]
 
 TestHelper.initTestsIfTemporaryInstallation = function (activateSifty) {
+  if (process.env.IS_PROD) {
+    return
+  }
+
   browser.runtime.onInstalled.addListener((details) => {
     // When installed as a temporary extension...
     if (details.temporary) {
