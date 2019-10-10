@@ -8,7 +8,11 @@ Get it as a [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/sift
 
 ## Developer Notes
 
-This extension uses [Node.js](https://nodejs.org/en/) v12. Use [`nvm`](https://github.com/nvm-sh/nvm) to install and manage your Node versions. 
+This extension uses [Node.js](https://nodejs.org/en/) v12.
+
+1. Install [NVM](https://github.com/nvm-sh/nvm). 
+2. Install Node using NVM: `nvm install 12.11.0`
+3. Install the dependencies for the project: `npm install`
 
 ### Testing
 
