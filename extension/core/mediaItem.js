@@ -1,3 +1,5 @@
+import * as _ from 'lodash'
+
 import MimeType from './mimeType'
 
 class MediaItem {
@@ -8,31 +10,53 @@ class MediaItem {
   }
 
   getLocalFilename () {
-    // Clean the query string parameters, hostname, and any
-    // characters that tend to break filepaths.
-    var url = this.src
-    var mimeType = this.mimeType
-    var result = url.substring(0, (url.indexOf('#') === -1 ? url.length : url.indexOf('#')))
-    result = result.substring(0, (result.indexOf('?') === -1 ? result.length : result.indexOf('?')))
-    result = result.substring(result.lastIndexOf('/') + 1, url.length)
-    result = result.replace(/[|\\/&:$%@!"<>()^+=?*,]/g, '_')
-
-    // Get the file extension, if there is one.
-    var a = result.split('.')
-    var ext = ''
-    if (!(a.length === 1 || (a[0] === '' && a.length === 2))) {
-      ext = a.pop()
-    }
-
-    // If the filename inferred from the URL doesn't have an extension,
-    // infer the extension from the mime type.
-    const extension = MimeType.getFileExtension(mimeType)
-    if (!ext || ext !== extension) {
-      result = result + '.' + extension
-    }
-
-    return result
+    const url = this.src
+    const mimeType = this.mimeType
+    const rawFilename = getFilenameFromUrl(url)
+    return cleanExtensionBasedOnMimeType(rawFilename, mimeType)
   }
+}
+
+function getFilenameFromUrl (url) {
+  const sansAnchor = trimAfter(url, '#')
+  const sansQuery = trimAfter(sansAnchor, '?')
+  const filename = everythingAfter(sansQuery, '/')
+  return replaceIllegalFilenameChars(filename)
+}
+
+function trimAfter (originalString, stringToFind) {
+  const index = originalString.indexOf(stringToFind)
+  return index === -1 ? originalString : originalString.substring(0, index)
+}
+
+function everythingAfter (originalString, stringToFind) {
+  const index = originalString.lastIndexOf(stringToFind)
+  return originalString.substring(index + 1, originalString.length)
+}
+
+function replaceIllegalFilenameChars (filename) {
+  return filename.replace(/[|\\/&:$%@!"<>()^+=?*,]/g, '_')
+}
+
+function getExtensionFromFilename (filename) {
+  return everythingAfter(filename, '.')
+}
+
+function cleanExtensionBasedOnMimeType (filename, mimeType) {
+  const givenExtension = getExtensionFromFilename(filename)
+  const mimeExtension = MimeType.getFileExtension(mimeType)
+
+  const filenameWithoutExtension = everythingBefore(filename, `.${givenExtension}`)
+  if (_.isNil(filenameWithoutExtension) ||
+      _.isEmpty(filenameWithoutExtension)) {
+    throw new Error('Filename cannot be empty.')
+  }
+  return `${filenameWithoutExtension}.${mimeExtension}`
+}
+
+function everythingBefore (originalString, stringToFind) {
+  const index = originalString.lastIndexOf(stringToFind)
+  return originalString.substring(0, index)
 }
 
 export default MediaItem
