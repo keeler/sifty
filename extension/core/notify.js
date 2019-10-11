@@ -12,13 +12,21 @@ Notify.workInProgress = function (numItemsInProgress) {
 }
 
 Notify.workComplete = function (numItemsCompleted) {
-  clearNotification(workInProgressNotificationId)
+  clearWorkInProgressNotification()
   let message = ''
   if (numItemsCompleted > 0) {
     message = `Done! (${numItemsCompleted} saved)`
   } else {
     message = 'No media files to download'
   }
+  createWorkCompleteNotification(message)
+}
+
+function clearWorkInProgressNotification () {
+  clearNotification(workInProgressNotificationId)
+}
+
+function createWorkCompleteNotification (message) {
   const id = workCompleteNotificationId
   const timeoutInMs = 2000
   createNotificationWithTimeout(id, message, timeoutInMs)
