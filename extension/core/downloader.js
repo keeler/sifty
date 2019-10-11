@@ -13,7 +13,7 @@ Downloader.downloadMediaItems = async function (mediaItemPromises) {
   Notify.workInProgress(mediaItems.length)
   const downloadsComplete = downloadAll(mediaItems)
 
-  return await Promise.all(downloadsComplete).then((completeDownloads) => {
+  return Promise.all(downloadsComplete).then((completeDownloads) => {
     Notify.workComplete(completeDownloads.length)
     return completeDownloads
   })
