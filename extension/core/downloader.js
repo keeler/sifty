@@ -5,10 +5,7 @@ import Notify from './notify'
 const Downloader = {}
 
 Downloader.downloadMediaItems = async function (mediaItemPromises) {
-  const mediaItems = await Promise.all(mediaItemPromises).then(items => {
-    return items.filter(item => item.isValid())
-  })
-
+  const mediaItems = await mediaItemPromises
   if (mediaItems.length <= 0) {
     return []
   }

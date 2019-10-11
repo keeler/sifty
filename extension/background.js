@@ -26,9 +26,11 @@ function downloadItemsInTabs (tabs) {
 }
 
 function findMediaItemsInTabs (tabs) {
-  return _.map(tabs, (tab) => {
-    return findMediaItemInTab(tab)
+  const mediaItems = _.map(tabs, tab => findMediaItemInTab(tab))
+  const validItems = Promise.all(mediaItems).then(items => {
+    return items.filter(item => item.isValid())
   })
+  return validItems
 }
 
 async function findMediaItemInTab (tab) {
