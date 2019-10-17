@@ -1,1 +1,6 @@
 sifty.zip
+
+node_modules/*
+
+build/*
+release/*

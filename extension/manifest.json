@@ -15,8 +15,7 @@
         "tabs",
         "downloads",
         "notifications",
-        "http://*/",
-        "https://*/"
+        "<all_urls>"
     ],
 
     "browser_action": {
@@ -27,6 +26,8 @@
     },
 
     "background": {
-        "scripts": ["sifty.js"]
+        "scripts": [
+            "background.js"
+        ]
     }
 }

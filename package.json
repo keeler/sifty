@@ -1,0 +1,43 @@
+{
+  "name": "sifty",
+  "version": "1.0.0",
+  "description": "A browser extension to Save Items From Tabs, Yo!",
+  "main": "main.js",
+  "scripts": {
+    "build": "rm -rf build && webpack --mode development --progress --hide-modules",
+    "build:prod": "rm -rf release/build && webpack --mode production --progress --hide-modules",
+    "release": "rm -rf release && npm run build:prod && npm run zip",
+    "zip": "cd release/build && zip -r ../sifty.zip * && cp ../sifty.zip ../sifty.xpi && cd ../../",
+    "clean": "rm -rf build release",
+    "lint": "npx eslint extension --quiet",
+    "firefox:prod": "npx web-ext run --sourceDir=release/build",
+    "firefox:dev": "npx web-ext run --sourceDir=build"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.0.4",
+    "eslint": "^6.5.1",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jasmine-core": "^3.5.0",
+    "web-ext": "^3.2.0",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-merge": "^4.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keeler/sifty.git"
+  },
+  "author": "Keeler Russell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keeler/sifty/issues"
+  },
+  "homepage": "https://github.com/keeler/sifty#readme"
+}
