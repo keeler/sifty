@@ -13,7 +13,9 @@ module.exports = {
     path: path.resolve(__dirname, './release/build'),
   },
   target: 'web',
-  mode: 'none',
+  // If none or production, breaks stuff. Not sure why.
+  // Addon is currently very small so minificaiton isn't critical.
+  mode: 'development',
   plugins,
   // Prefer size and performance
   devtool: 'none',
