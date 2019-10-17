@@ -37,5 +37,5 @@ A test page should automatically launch and show the outcome of the tests.
     ```
 2. Package up the extension for uploading to the Firefox Add-on repository, and follow the instructions [here](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) to submit a new version of sifty. You'll find a .zip and .xpi in the release/ subfolder.
     ```
-    npm run build:prod && npm run zip
+    npm run clean && npm run build:prod && npm run zip
     ```
