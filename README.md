@@ -1,4 +1,4 @@
-<p align="left"><img src=https://raw.githubusercontent.com/keeler/sifty/master/icons/sifty.png></p>
+<p align="left"><img src=https://raw.githubusercontent.com/keeler/sifty/master/extension/icons/sifty.png></p>
 
 Browser extension to **S**ave **I**tems **F**rom **T**abs, **Y**o!
 
