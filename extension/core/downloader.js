@@ -11,18 +11,17 @@ Downloader.downloadMediaItems = async function (mediaItemPromises) {
   }
 
   Notify.workInProgress(mediaItems.length)
-  const downloadsComplete = downloadAll(mediaItems)
-
-  return Promise.all(downloadsComplete).then((completeDownloads) => {
+  return downloadAll(mediaItems).then((completeDownloads) => {
     Notify.workComplete(completeDownloads.length)
     return completeDownloads
   })
 }
 
 function downloadAll (mediaItems) {
-  return _.map(mediaItems, (item) => {
+  const downloads = _.map(mediaItems, (item) => {
     return item.downloadAndCloseTab()
   })
+  return Promise.all(downloads)
 }
 
 export default Downloader
