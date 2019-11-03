@@ -20,14 +20,20 @@ Tests are automated using Jasmine, modelled after the tests in the [sync-tab-gro
 
 You can run the tests with this command:
 ```
-npm run build && npm run firefox:dev
+npm run test
 ```
 
 This will build the extension with tests included and load it as a temporary extension in Firefox using `web-ext`.
 
-A test page should automatically launch and show the outcome of the tests.
+Two firefox windows will open automatically:
+1. Window 1:
+    - `about:debugging` to access console & debugging tools for the extension
+    - `about:addons` to adjust the settings of the extension, e.g. enable in private browsing.
+1. Window 2:
+    - Unit tests
+    - Integration tests
 
-**NOTE:** If the tests fail, you may need to [allow the extension in private browsing](https://support.mozilla.org/en-US/kb/extensions-private-browsing). When you click 'Allow' the test page should reload automatically because the extension reloads.
+**NOTE:** If the integration tests fail, you may need to [allow the extension in private browsing](https://support.mozilla.org/en-US/kb/extensions-private-browsing). When you click 'Allow' the test page should reload automatically because the extension reloads.
 
 ### Releasing
 
@@ -37,5 +43,5 @@ A test page should automatically launch and show the outcome of the tests.
     ```
 2. Package up the extension for uploading to the Firefox Add-on repository, and follow the instructions [here](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) to submit a new version of sifty. You'll find a .zip and .xpi in the release/ subfolder.
     ```
-    npm run clean && npm run build:prod && npm run zip
+    npm run release
     ```
