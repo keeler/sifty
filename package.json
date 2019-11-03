@@ -4,14 +4,15 @@
   "description": "A browser extension to Save Items From Tabs, Yo!",
   "main": "main.js",
   "scripts": {
+    "lint": "npx eslint extension --quiet",
+    "test": "npm run clean && npm run build && npm run firefox:dev",
     "build": "rm -rf build && webpack --mode development --progress --hide-modules",
     "build:prod": "rm -rf release/build && webpack --mode production --progress --hide-modules",
-    "release": "rm -rf release && npm run build:prod && npm run zip",
-    "zip": "cd release/build && zip -r ../sifty.zip * && cp ../sifty.zip ../sifty.xpi && cd ../../",
     "clean": "rm -rf build release",
-    "lint": "npx eslint extension --quiet",
     "firefox:prod": "npx web-ext run --sourceDir=release/build",
-    "firefox:dev": "npx web-ext run --sourceDir=build"
+    "firefox:dev": "npx web-ext run --sourceDir=build",
+    "release": "npm run clean && npm run build:prod && npm run zip",
+    "zip": "cd release/build && zip -r ../sifty.zip * && cp ../sifty.zip ../sifty.xpi && cd ../../"
   },
   "dependencies": {
     "lodash": "^4.17.15"
