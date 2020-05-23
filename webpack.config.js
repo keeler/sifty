@@ -1,21 +1,10 @@
 const path = require('path');
-const webpack = require('webpack');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const devConfig = require('./webpack.dev.config');
 const prodConfig = require('./webpack.prod.config');
 
-function copy(path) {
-  return {
-    from: path,
-    to: path,
-  };
-}
-
-function multipleCopy(...paths) {
-  return paths.map(copy);
-}
 
 const config = {
   context: path.resolve(__dirname, './extension'),
@@ -38,12 +27,12 @@ const config = {
     rules: [],
   },
   plugins: [
-    new CopyWebpackPlugin(
-      multipleCopy('manifest.json')
-        .concat([
-          {from: 'icons/*'},
-        ])
-    ),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'manifest.json' },
+        { from: 'icons/*' }
+      ]
+    }),
   ],
 };
 

@@ -6,15 +6,18 @@ const plugins = [
   new webpack.DefinePlugin({
     'process.env.IS_PROD': false,
   }),
-  new CopyWebpackPlugin([
-    {
-      from: 'node_modules/jasmine-core/lib/jasmine-core/*.*',
-      to: 'test/utils/jasmine-core/',
-      context: '../',
-      flatten: true,
-    },
-    {from: 'test/**'}
-  ]),
+  new CopyWebpackPlugin({
+    patterns: [
+      {
+        from: 'node_modules/jasmine-core/lib/jasmine-core/*.*',
+        to: 'test/utils/jasmine-core/',
+        context: '../',
+        flatten: true,
+      },
+      { from: 'test/**' }
+    ]
+  }
+  ),
 ];
 
 module.exports = {
