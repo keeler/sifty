@@ -15,7 +15,7 @@
     "zip": "cd release/build && zip -r ../sifty.zip * && cp ../sifty.zip ../sifty.xpi && cd ../../"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.4",
